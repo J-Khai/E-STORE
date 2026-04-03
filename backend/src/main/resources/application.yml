@@ -22,7 +22,7 @@ server:
   port: 8081
 
 jwt:
-  secret: ${JWT_SECRET:estore-dev-secret-key-change-this-in-production-minimum-32-chars}
+  secret: ${JWT_SECRET}
 
 cors:
-  allowed-origin: ${ALLOWED_ORIGIN:http://localhost:5173}
+  allowed-origin: ${ALLOWED_ORIGIN}

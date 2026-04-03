@@ -110,6 +110,21 @@ const CheckoutPage = () => {
         );
     }
 
+    if (!isAuthenticated) {
+        return (
+            <div className="max-w-[1440px] mx-auto px-12 py-32 flex flex-col items-center justify-center min-h-[60vh] text-center">
+                <h1 className="text-4xl font-bold tracking-tighter uppercase mb-6 text-zinc-950">Guest Checkout</h1>
+                <p className="text-[10px] font-bold text-zinc-950/40 uppercase tracking-[0.2em] mb-12 max-w-md leading-relaxed">
+                    Please log into your account with a password, or create a new account to proceed with your checkout. Your selected items will be safely retained.
+                </p>
+                <div className="flex gap-6">
+                    <Link to="/login?redirect=checkout" className="btn-primary px-12">Log In</Link>
+                    <Link to="/register?redirect=checkout" className="border-4 border-zinc-950 text-zinc-950 font-bold uppercase tracking-widest text-[11px] px-12 py-4 hover:bg-zinc-950 hover:text-white transition-colors">Create Account</Link>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className="page-container py-20 lg:py-32">
             <h1 className="text-4xl lg:text-5xl font-bold tracking-tighter uppercase text-zinc-950 mb-16 underline decoration-4 underline-offset-8">

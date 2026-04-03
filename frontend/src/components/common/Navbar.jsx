@@ -83,7 +83,7 @@ const Navbar = () => {
               </Link>
           )}
 
-          {user?.role === 'CUSTOMER' && (
+          {(!user || user?.role === 'CUSTOMER') && (
             <Link to="/cart" className="nav-link nav-link-inactive">Cart</Link>
           )}
           
@@ -193,9 +193,11 @@ const Navbar = () => {
             )}
 
             <div className="pt-6 divider-soft space-y-6">
+              {(!user || user?.role === 'CUSTOMER') && (
+                  <Link to="/cart" onClick={() => setIsMenuOpen(false)} className="nav-link block nav-link-inactive uppercase font-bold text-[10px]">Your Cart</Link>
+              )}
               {user?.role === 'CUSTOMER' && (
                 <>
-                  <Link to="/cart" onClick={() => setIsMenuOpen(false)} className="nav-link block nav-link-inactive uppercase font-bold text-[10px]">Your Cart</Link>
                   <Link to="/profile" onClick={() => setIsMenuOpen(false)} className="nav-link block nav-link-inactive uppercase font-bold text-[10px]">My Profile</Link>
                   <Link to="/profile/history" onClick={() => setIsMenuOpen(false)} className="nav-link block nav-link-inactive uppercase font-bold text-[10px]">Order History</Link>
                 </>

@@ -68,12 +68,12 @@ public class AdminReportController {
 
         // totals at the top
         double totalRevenue = orders.stream()
-            .filter(o -> o.getStatus() != null && "PAID".equals(o.getStatus().name()))
+            .filter(o -> o.getStatus() != null && java.util.Arrays.asList("PAID", "APPROVED", "PROCESSED", "SHIPPED").contains(o.getStatus().name()))
             .mapToDouble(o -> o.getTotalAmount() != null ? o.getTotalAmount() : 0.0)
             .sum();
 
         long paidCount = orders.stream()
-            .filter(o -> o.getStatus() != null && "PAID".equals(o.getStatus().name()))
+            .filter(o -> o.getStatus() != null && java.util.Arrays.asList("PAID", "APPROVED", "PROCESSED", "SHIPPED").contains(o.getStatus().name()))
             .count();
 
         PdfPTable summaryTable = new PdfPTable(3);
@@ -115,7 +115,8 @@ public class AdminReportController {
             addRowCell(table, rowBg, cellFont, name);
             addRowCell(table, rowBg, cellFont, total);
 
-            Font statusFont = "PAID".equals(status) ? paidFont : failFont;
+            boolean isSuccess = java.util.Arrays.asList("PAID", "APPROVED", "PROCESSED", "SHIPPED").contains(status);
+            Font statusFont = isSuccess ? paidFont : failFont;
             PdfPCell statusCell = new PdfPCell(new Phrase(status, statusFont));
             statusCell.setBackgroundColor(rowBg);
             statusCell.setPadding(8);

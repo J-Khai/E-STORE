@@ -29,6 +29,7 @@ public class AdminController {
     private final UserRepository userRepository;
     private final com.estore.repository.CartRepository cartRepository;
     private final com.estore.repository.PaymentMethodRepository paymentMethodRepository;
+    private final com.estore.service.PaymentService paymentService;
 
     // product endpoints
 
@@ -45,6 +46,14 @@ public class AdminController {
         if (updates.containsKey("stock")) p.setStock((Integer) updates.get("stock"));
         if (updates.containsKey("price")) p.setPrice(Double.valueOf(updates.get("price").toString()));
         if (updates.containsKey("name"))  p.setName((String) updates.get("name"));
+        if (updates.containsKey("description"))  p.setDescription((String) updates.get("description"));
+        if (updates.containsKey("brand"))  p.setBrand((String) updates.get("brand"));
+        if (updates.containsKey("imageUrl"))  p.setImageUrl((String) updates.get("imageUrl"));
+        if (updates.containsKey("categoryId") && updates.get("categoryId") != null) {
+            com.estore.model.Category c = new com.estore.model.Category();
+            c.setId(Long.valueOf(updates.get("categoryId").toString()));
+            p.setCategory(c);
+        }
         if (updates.containsKey("isFeatured"))  p.setIsFeatured((Boolean) updates.get("isFeatured"));
         return ResponseEntity.ok(productRepository.save(p));
     }
@@ -105,8 +114,20 @@ public class AdminController {
             .contentType(org.springframework.http.MediaType.APPLICATION_PDF)
             .body(bytes);
     }
+    @org.springframework.security.access.prepost.PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/products")
     public ResponseEntity<Product> addProduct(@RequestBody Product product) {
         return ResponseEntity.ok(productRepository.save(product));
+    }
+
+    @org.springframework.security.access.prepost.PreAuthorize("hasRole('ADMIN')")
+    @DeleteMapping("/products/{id}")
+    public ResponseEntity<Void> deleteProduct(@PathVariable("id") Long id) {
+        if (!productRepository.existsById(id)) {
+            return ResponseEntity.notFound().build();
+        }
+        productRepository.deleteById(id);
+        return ResponseEntity.noContent().build();
     }
 
     // upload a new image for a product, saves to static folder and updates the url
@@ -117,9 +138,11 @@ public class AdminController {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Product not found: " + id));
         
-        // save to the local images folder
-        Path staticDir = Paths.get("src", "main", "resources", "static", "images");
-        Files.createDirectories(staticDir);
+        // use dynamic uploads folder accessible to Docker container
+        Path staticDir = Paths.get("uploads");
+        if (!Files.exists(staticDir)) {
+            Files.createDirectories(staticDir);
+        }
 
         // use timestamp so we don't overwrite if files have the same name
         String filename = "product-" + id + "-" + System.currentTimeMillis() +
@@ -127,7 +150,11 @@ public class AdminController {
         Path target = staticDir.resolve(filename);
         Files.copy(file.getInputStream(), target, StandardCopyOption.REPLACE_EXISTING);
 
-        product.setImageUrl("/images/" + filename);
+        String baseUrl = System.getenv("ALLOWED_ORIGIN") != null && System.getenv("ALLOWED_ORIGIN").contains("netlify")
+                ? "https://estore-backend.onrender.com" // mock prod domain if needed
+                : "http://localhost:8081";
+
+        product.setImageUrl(baseUrl + "/uploads/" + filename);
         return ResponseEntity.ok(productRepository.save(product));
     }
 
@@ -197,6 +224,34 @@ public class AdminController {
             if (addrMap.get("zip") != null) address.setZipCode(addrMap.get("zip"));
         }
 
+        if (updates.containsKey("card") && updates.get("card") instanceof Map) {
+            @SuppressWarnings("unchecked")
+            Map<String, String> cardMap = (Map<String, String>) updates.get("card");
+            String number = cardMap.get("cardNumber");
+            String expiry = cardMap.get("expiryDate");
+            
+            if (number != null && !number.isBlank()) {
+                if (!paymentService.isValidLuhn(number)) {
+                    Map<String, String> fail = new HashMap<>();
+                    fail.put("status", "FAIL");
+                    fail.put("message", "Invalid card according to system validator.");
+                    return ResponseEntity.badRequest().body(fail);
+                }
+
+                List<com.estore.model.PaymentMethod> methods = paymentMethodRepository.findByUserId(id);
+                com.estore.model.PaymentMethod method = methods.isEmpty() ? new com.estore.model.PaymentMethod() : methods.get(0);
+                
+                method.setUser(user);
+                method.setCardBrand("CREDIT");
+                method.setLastFourDigits(number.substring(Math.max(0, number.length() - 4)));
+                method.setExpirationDate(expiry != null ? expiry : "12/99");
+                if (method.getGatewayToken() == null) {
+                    method.setGatewayToken(java.util.UUID.randomUUID().toString());
+                }
+                paymentMethodRepository.save(method);
+            }
+        }
+
         userRepository.save(user);
         
         Map<String, String> res = new HashMap<>();
@@ -206,11 +261,16 @@ public class AdminController {
     }
 
     @org.springframework.security.access.prepost.PreAuthorize("hasRole('ADMIN')")
-    @DeleteMapping("/users/{id}")
     @org.springframework.transaction.annotation.Transactional
-    public ResponseEntity<Void> deleteUser(@PathVariable("id") Long id) {
+    @DeleteMapping("/users/{id}")
+    public ResponseEntity<?> deleteUser(@PathVariable("id") Long id) {
         com.estore.model.User user = userRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("User not found: " + id));
+
+        if (user.getRole() == com.estore.model.Role.ADMIN) {
+             return ResponseEntity.status(org.springframework.http.HttpStatus.FORBIDDEN)
+                     .body(Map.of("error", "Protected Account: Admin users cannot be deleted."));
+        }
 
         // clean up the cart and payment methods since they only belong to this user
         cartRepository.findByUser(user).ifPresent(cartRepository::delete);
@@ -240,7 +300,7 @@ public class AdminController {
         List<com.estore.model.Order> filteredOrders = orderRepository.findByCreatedAtBetween(startDate, now);
         
         double periodRevenue = filteredOrders.stream()
-                .filter(o -> o.getStatus() != null && "PAID".equalsIgnoreCase(o.getStatus().name()))
+                .filter(o -> o.getStatus() != null && java.util.Arrays.asList("PAID", "APPROVED", "PROCESSED", "SHIPPED").contains(o.getStatus().name()))
                 .mapToDouble(o -> o.getTotalAmount() != null ? o.getTotalAmount() : 0.0)
                 .sum();
 

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { authService } from '../services/authService';
 import { useAuth } from '../context/AuthContext';
 
@@ -10,6 +10,7 @@ const LoginPage = () => {
   const [loading, setLoading] = useState(false);
   
   const navigate = useNavigate();
+  const location = useLocation();
   const { login: authLogin } = useAuth();
 
   const handleSubmit = async (e) => {
@@ -21,7 +22,14 @@ const LoginPage = () => {
       const response = await authService.login({ email, password });
       const { token, ...userData } = response;
       authLogin(userData, token);
-      navigate('/products');
+      
+      const queryParams = new URLSearchParams(location.search);
+      const redirectParam = queryParams.get('redirect');
+      if (redirectParam === 'checkout') {
+          navigate('/checkout');
+      } else {
+          navigate('/products');
+      }
     } catch (err) {
       console.error('oops login failed', err);
       setError('Invalid email or password. Please try again.');
@@ -77,7 +85,7 @@ const LoginPage = () => {
 
         <footer className="mt-12 text-center">
           <p className="label-mono text-zinc-950/40">
-            Don't have an account? <Link to="/register" className="text-zinc-950 underline underline-offset-4">Register</Link>
+            Don't have an account? <Link to={`/register${location.search}`} className="text-zinc-950 underline underline-offset-4">Register</Link>
           </p>
         </footer>
       </div>

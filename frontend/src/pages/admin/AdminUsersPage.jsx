@@ -6,11 +6,13 @@ const AdminUsersPage = () => {
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [editingUser, setEditingUser] = useState(null);
-    const [editForm, setEditForm] = useState({ 
-        firstName: '', 
-        lastName: '', 
-        address: { street: '', city: '', state: '', zip: '' } 
+    const [editForm, setEditForm] = useState({
+        firstName: '',
+        lastName: '',
+        address: { street: '', city: '', state: '', zip: '' },
+        card: { cardNumber: '', expiryDate: '' }
     });
+    const [searchQuery, setSearchQuery] = useState('');
 
     const loadUsers = () => {
         setLoading(true);
@@ -41,6 +43,10 @@ const AdminUsersPage = () => {
                 city: addr.city || '',
                 state: addr.state || '',
                 zip: addr.zipCode || addr.zip || ''
+            },
+            card: {
+                cardNumber: '', // dont show old full number for security, just let admin overwrite
+                expiryDate: (user.paymentMethods && user.paymentMethods.length > 0) ? user.paymentMethods[0].expirationDate : '12/99'
             }
         });
     };
@@ -73,14 +79,23 @@ const AdminUsersPage = () => {
         <div className="space-y-12">
             <header className="divider-soft pb-8 flex flex-col md:flex-row justify-between items-end gap-6">
                 <div>
-                  <h1 className="heading-large tracking-tighter uppercase text-zinc-950">User Directory</h1>
-                  <p className="label-mono mt-2">Internal accounts overview | User Registry</p>
+                    <h1 className="heading-large tracking-tighter uppercase text-zinc-950">User Directory</h1>
+                    <p className="label-mono mt-2">Internal accounts overview | User Registry</p>
+                </div>
+                <div className="w-full md:w-80">
+                    <input
+                        type="text"
+                        placeholder="Search by Email..."
+                        className="input-field w-full"
+                        value={searchQuery}
+                        onChange={e => setSearchQuery(e.target.value)}
+                    />
                 </div>
             </header>
 
             {loading ? (
                 <div className="mono text-[10px] uppercase tracking-widest animate-pulse font-bold text-zinc-950/40 py-12">
-                     Loading Users...
+                    Loading Users...
                 </div>
             ) : (
                 <div className="admin-table-container">
@@ -96,9 +111,9 @@ const AdminUsersPage = () => {
                                 </tr>
                             </thead>
                             <tbody className="divide-soft">
-                                {users.map(u => {
+                                {users.filter(u => u.email.toLowerCase().includes(searchQuery.toLowerCase())).map(u => {
                                     const isEditing = editingUser === u.id;
-                                    const formattedAddr = u.address ? `${u.address.street}, ${u.address.city}` : '— (unset)';
+                                    const formattedAddr = u.address ? `${u.address.street}, ${u.address.city}` : 'No Address Saved';
                                     return (
                                         <tr key={u.id} className="group hover:bg-zinc-50 transition-colors">
                                             <td className="py-6 pl-6 text-xs font-mono tracking-tighter text-zinc-950/40 italic">
@@ -107,17 +122,17 @@ const AdminUsersPage = () => {
                                             <td className="py-6 px-4">
                                                 {isEditing ? (
                                                     <div className="flex gap-2">
-                                                        <input 
-                                                            type="text" 
+                                                        <input
+                                                            type="text"
                                                             className="text-xs uppercase font-bold tracking-tight bg-zinc-50 border border-zinc-200 px-2 py-1 w-24"
                                                             value={editForm.firstName}
-                                                            onChange={e => setEditForm(p => ({...p, firstName: e.target.value}))}
+                                                            onChange={e => setEditForm(p => ({ ...p, firstName: e.target.value }))}
                                                         />
-                                                        <input 
-                                                            type="text" 
+                                                        <input
+                                                            type="text"
                                                             className="text-xs uppercase font-bold tracking-tight bg-zinc-50 border border-zinc-200 px-2 py-1 w-24"
                                                             value={editForm.lastName}
-                                                            onChange={e => setEditForm(p => ({...p, lastName: e.target.value}))}
+                                                            onChange={e => setEditForm(p => ({ ...p, lastName: e.target.value }))}
                                                         />
                                                     </div>
                                                 ) : (
@@ -129,34 +144,34 @@ const AdminUsersPage = () => {
                                             <td className="py-6 text-xs text-zinc-950/60 uppercase font-bold tracking-tight pr-6">
                                                 {isEditing ? (
                                                     <div className="grid grid-cols-2 gap-2 w-full max-w-sm">
-                                                        <input 
-                                                            type="text" 
+                                                        <input
+                                                            type="text"
                                                             className="col-span-2 text-xs uppercase font-bold tracking-tight bg-zinc-50 border border-zinc-200 px-2 py-1"
                                                             placeholder="Street"
                                                             value={editForm.address.street}
-                                                            onChange={e => setEditForm(p => ({...p, address: {...p.address, street: e.target.value}}))}
+                                                            onChange={e => setEditForm(p => ({ ...p, address: { ...p.address, street: e.target.value } }))}
                                                         />
-                                                        <input 
-                                                            type="text" 
+                                                        <input
+                                                            type="text"
                                                             className="text-xs uppercase font-bold tracking-tight bg-zinc-50 border border-zinc-200 px-2 py-1"
                                                             placeholder="City"
                                                             value={editForm.address.city}
-                                                            onChange={e => setEditForm(p => ({...p, address: {...p.address, city: e.target.value}}))}
+                                                            onChange={e => setEditForm(p => ({ ...p, address: { ...p.address, city: e.target.value } }))}
                                                         />
                                                         <div className="flex gap-1">
-                                                            <input 
-                                                                type="text" 
+                                                            <input
+                                                                type="text"
                                                                 className="text-xs uppercase font-bold tracking-tight bg-zinc-50 border border-zinc-200 px-2 py-1 w-full"
                                                                 placeholder="ST"
                                                                 value={editForm.address.state}
-                                                                onChange={e => setEditForm(p => ({...p, address: {...p.address, state: e.target.value}}))}
+                                                                onChange={e => setEditForm(p => ({ ...p, address: { ...p.address, state: e.target.value } }))}
                                                             />
-                                                            <input 
-                                                                type="text" 
+                                                            <input
+                                                                type="text"
                                                                 className="text-xs uppercase font-bold tracking-tight bg-zinc-50 border border-zinc-200 px-2 py-1 w-full"
                                                                 placeholder="ZIP"
                                                                 value={editForm.address.zip}
-                                                                onChange={e => setEditForm(p => ({...p, address: {...p.address, zip: e.target.value}}))}
+                                                                onChange={e => setEditForm(p => ({ ...p, address: { ...p.address, zip: e.target.value } }))}
                                                             />
                                                         </div>
                                                     </div>
@@ -165,22 +180,41 @@ const AdminUsersPage = () => {
                                                 )}
                                             </td>
                                             <td className="py-6">
-                                                <span className={`text-[9px] font-black uppercase tracking-widest px-3 py-1 rounded-full border border-zinc-200
-                                                    ${u.role === 'ADMIN' ? 'bg-zinc-950 text-white' : 'bg-white text-zinc-950'}`}>
-                                                    {u.role}
-                                                </span>
+                                                {isEditing ? (
+                                                    <div className="flex flex-col gap-2">
+                                                        <input
+                                                            type="text"
+                                                            placeholder="Card Number"
+                                                            className="text-[10px] font-bold tracking-tight bg-zinc-50 border border-zinc-200 px-2 py-1 w-32"
+                                                            value={editForm.card.cardNumber}
+                                                            onChange={e => setEditForm(p => ({ ...p, card: { ...p.card, cardNumber: e.target.value } }))}
+                                                        />
+                                                        <input
+                                                            type="text"
+                                                            placeholder="MM/YY"
+                                                            className="text-[10px] font-bold tracking-tight bg-zinc-50 border border-zinc-200 px-2 py-1 w-20"
+                                                            value={editForm.card.expiryDate}
+                                                            onChange={e => setEditForm(p => ({ ...p, card: { ...p.card, expiryDate: e.target.value } }))}
+                                                        />
+                                                    </div>
+                                                ) : (
+                                                    <span className={`text-[9px] font-black uppercase tracking-widest px-3 py-1 rounded-full border border-zinc-200
+                                                        ${u.role === 'ADMIN' ? 'bg-zinc-950 text-white' : 'bg-white text-zinc-950'}`}>
+                                                        {u.role}
+                                                    </span>
+                                                )}
                                             </td>
                                             <td className="py-6 text-right pr-6">
                                                 <div className="flex justify-end gap-6 items-center">
                                                     {isEditing ? (
                                                         <>
-                                                            <button 
+                                                            <button
                                                                 onClick={() => handleUpdate(u.id)}
                                                                 className="text-[10px] font-bold uppercase tracking-widest text-green-600 hover:underline underline-offset-4"
                                                             >
                                                                 Confirm
                                                             </button>
-                                                            <button 
+                                                            <button
                                                                 onClick={() => setEditingUser(null)}
                                                                 className="text-[10px] font-bold uppercase tracking-widest text-zinc-950/20 hover:text-zinc-950"
                                                             >
@@ -189,18 +223,20 @@ const AdminUsersPage = () => {
                                                         </>
                                                     ) : (
                                                         <>
-                                                            <button 
+                                                            <button
                                                                 onClick={() => startEdit(u)}
                                                                 className="text-[10px] font-bold uppercase tracking-widest text-zinc-950/40 hover:text-zinc-950"
                                                             >
                                                                 Update
                                                             </button>
-                                                            <button 
-                                                                onClick={() => handleDelete(u.id)}
-                                                                className="text-[10px] font-bold uppercase tracking-widest text-red-400 opacity-0 group-hover:opacity-100 transition-all hover:text-red-600"
-                                                            >
-                                                                Delete
-                                                            </button>
+                                                            {u.role !== 'ADMIN' && (
+                                                                <button
+                                                                    onClick={() => handleDelete(u.id)}
+                                                                    className="text-[10px] font-bold uppercase tracking-widest text-red-400 opacity-0 group-hover:opacity-100 transition-all hover:text-red-600"
+                                                                >
+                                                                    Delete
+                                                                </button>
+                                                            )}
                                                         </>
                                                     )}
                                                 </div>

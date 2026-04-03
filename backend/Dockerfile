@@ -23,6 +23,9 @@ RUN addgroup --system estore \
 
 COPY --from=build /app/target/*.jar app.jar
 
+# Create an uploads folder and allow the estore user to own it
+RUN mkdir -p /app/uploads && chown -R estore:estore /app/uploads
+
 USER estore
 
 # Port must match server.port in application.yml

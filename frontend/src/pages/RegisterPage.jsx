@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { authService } from '../services/authService';
 
 const RegisterPage = () => {
@@ -13,6 +13,7 @@ const RegisterPage = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -25,7 +26,13 @@ const RegisterPage = () => {
 
     try {
       await authService.register(formData);
-      navigate('/login');
+      const queryParams = new URLSearchParams(location.search);
+      const redirectParam = queryParams.get('redirect');
+      if (redirectParam) {
+          navigate(`/login?redirect=${redirectParam}`);
+      } else {
+          navigate('/login');
+      }
     } catch (err) {
       console.error('oops registration error', err);
       setError('Registration failed. Email may already be in use.');
@@ -112,7 +119,7 @@ const RegisterPage = () => {
 
         <footer className="mt-12 text-center">
             <p className="label-mono">
-                Already a member? <Link to="/login" className="text-zinc-950 underline underline-offset-4">Log In</Link>
+                Already a member? <Link to={`/login${location.search}`} className="text-zinc-950 underline underline-offset-4">Log In</Link>
             </p>
         </footer>
       </div>
