@@ -1,0 +1,21 @@
+
+# ||REGISTER|| 
+# POST http://localhost:8081/api/auth/register
+# Content-Type: application/json
+
+# {
+#   "firstName": "Jaheim",
+#   "lastName": "Prendagast",
+#   "email": "jaheim@example.com",
+#   "password": "SecurePassword123!",
+#   "role": "CUSTOMER"
+# }
+
+# ||LOGIN||
+# POST http://localhost:8081/api/auth/login
+# Content-Type: application/json
+
+# {
+#   "email": "jaheim@example.com",
+#   "password": "SecurePassword123!"
+# }

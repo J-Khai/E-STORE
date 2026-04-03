@@ -1,0 +1,12 @@
+
+#!/usr/bin/env bash
+set -e
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+MVNW_REPOURL="https://repo.maven.apache.org/maven2"
+MVNW_VERSION="3.9.8"
+MVNW_DIR="${DIR}/.mvn/wrapper"
+if [ ! -f "${MVNW_DIR}/maven-wrapper.jar" ]; then
+  echo "Downloading Maven Wrapper JAR ..."
+  curl -L "${MVNW_REPOURL}/org/apache/maven/wrapper/maven-wrapper/${MVNW_VERSION}/maven-wrapper-${MVNW_VERSION}.jar" -o "${MVNW_DIR}/maven-wrapper.jar"
+fi
+exec java -jar "${MVNW_DIR}/maven-wrapper.jar" "$@"

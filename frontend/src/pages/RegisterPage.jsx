@@ -1,0 +1,123 @@
+import React, { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import { authService } from '../services/authService';
+
+const RegisterPage = () => {
+  const [formData, setFormData] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    password: '',
+    role: 'CUSTOMER'
+  });
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+
+  const handleInputChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+
+    try {
+      await authService.register(formData);
+      navigate('/login');
+    } catch (err) {
+      console.error('oops registration error', err);
+      setError('Registration failed. Email may already be in use.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="flex items-center justify-center min-h-[calc(100vh-140px)] bg-zinc-50">
+      <div className="auth-card">
+        <header className="mb-12 divider-soft pb-6">
+          <h1 className="heading-large tracking-tighter uppercase text-zinc-950">
+            Create Account
+          </h1>
+          <p className="label-mono mt-2">
+            Join our community
+          </p>
+        </header>
+
+        {error && (
+          <div className="mb-6 p-4 border border-red-200 bg-red-50 text-red-600 text-[10px] font-bold uppercase tracking-widest leading-relaxed">
+            {error}
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="flex gap-4">
+            <div className="flex-1">
+              <label className="input-label">First Name</label>
+              <input
+                type="text"
+                name="firstName"
+                value={formData.firstName}
+                onChange={handleInputChange}
+                className="input-field p-2 bg-zinc-50 border-main focus:border-zinc-950 outline-none text-sm transition-all rounded-none"
+                required
+              />
+            </div>
+            <div className="flex-1">
+              <label className="input-label">Last Name</label>
+              <input
+                type="text"
+                name="lastName"
+                value={formData.lastName}
+                onChange={handleInputChange}
+                className="input-field p-2 bg-zinc-50 border-main focus:border-zinc-950 outline-none text-sm transition-all rounded-none"
+                required
+              />
+            </div>
+          </div>
+          <div>
+            <label className="input-label">Email Address</label>
+            <input
+              type="email"
+              name="email"
+              value={formData.email}
+              onChange={handleInputChange}
+              className="input-field"
+              placeholder="user@example.com"
+              required
+            />
+          </div>
+          <div>
+            <label className="input-label">Password</label>
+            <input
+              type="password"
+              name="password"
+              value={formData.password}
+              onChange={handleInputChange}
+              className="input-field"
+              required
+            />
+          </div>
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="btn-primary w-full mt-4"
+          >
+            {loading ? 'Joining...' : 'Create Account'}
+          </button>
+        </form>
+
+        <footer className="mt-12 text-center">
+            <p className="label-mono">
+                Already a member? <Link to="/login" className="text-zinc-950 underline underline-offset-4">Log In</Link>
+            </p>
+        </footer>
+      </div>
+    </div>
+  );
+};
+
+export default RegisterPage;

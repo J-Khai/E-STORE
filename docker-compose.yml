@@ -1,0 +1,64 @@
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: estore-db
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-dev_password_do_not_use}
+      POSTGRES_DB: ${POSTGRES_DB:-estore}
+    # ports:
+    #   - "${POSTGRES_PORT:-5432}:5432" # Commented out to prevent exposing the DB to the internet in production
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - estore-network
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-estore}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: estore-backend
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/${POSTGRES_DB:-estore}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-postgres}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-dev_password_do_not_use}
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_JPA_DATABASE_PLATFORM: org.hibernate.dialect.PostgreSQLDialect
+      JWT_SECRET: ${JWT_SECRET}
+      ALLOWED_ORIGIN: http://localhost:3000
+    ports:
+      - "${BACKEND_PORT:-8081}:8081"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - estore-network
+    restart: on-failure
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        - VITE_API_BASE_URL=http://localhost:8081/api
+    container_name: estore-frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    networks:
+      - estore-network
+    restart: on-failure
+
+networks:
+  estore-network:
+    driver: bridge
+
+volumes:
+  postgres-data:

@@ -1,0 +1,189 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Montserrat:wght@700&family=EB+Garamond:ital,wght@1,600&family=Roboto+Mono&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  /* generic layout stuff */
+  .page-container {
+    @apply max-w-[1440px] mx-auto px-6 lg:px-12 py-16;
+  }
+
+  .auth-card {
+    @apply w-[90%] sm:w-full sm:max-w-sm p-8 sm:p-12 bg-white border border-[#e2e8f0] rounded-none;
+  }
+
+  .admin-dashboard-layout {
+    @apply flex flex-col lg:flex-row min-h-[calc(100vh-64px)];
+  }
+
+  .admin-sidebar {
+    @apply w-full lg:w-64 border-b lg:border-b-0 lg:border-r border-[#e2e8f0] bg-white p-8 space-y-8 lg:space-y-12 shrink-0;
+  }
+
+  /* text styles */
+  .label-mono {
+    @apply text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-950/40;
+  }
+
+  .input-label {
+    @apply text-[10px] font-bold text-zinc-950 uppercase tracking-widest block mb-2;
+  }
+
+  .heading-large {
+    @apply text-3xl md:text-4xl font-bold tracking-tighter uppercase text-zinc-950;
+  }
+
+  /* ui components */
+  .input-field {
+    @apply w-full p-3 bg-zinc-50 border border-[#e2e8f0] focus:border-zinc-950 outline-none text-sm transition-all rounded-none;
+  }
+
+  .btn-primary {
+    @apply bg-zinc-950 text-white text-[10px] font-bold uppercase tracking-[0.2em] py-4 px-8 
+           hover:bg-zinc-800 active:bg-zinc-700 transition-all rounded-none disabled:opacity-50;
+  }
+
+  .btn-outline {
+    @apply border border-zinc-950 bg-transparent text-zinc-950 text-[9px] font-bold uppercase tracking-[0.15em] py-2 px-4
+           hover:bg-zinc-950 hover:text-white active:bg-zinc-800 transition-all duration-300 rounded-none;
+  }
+
+  .nav-link {
+    @apply text-[10px] uppercase font-bold tracking-widest transition-colors;
+  }
+
+  .nav-link-active {
+    @apply text-zinc-950 underline underline-offset-8 decoration-2;
+  }
+
+  .nav-link-inactive {
+    @apply text-zinc-950/40 hover:text-zinc-950;
+  }
+
+  /* product cards */
+  .product-card {
+    @apply flex flex-col h-full bg-white border border-[#e2e8f0] hover:shadow-subtle transition-all duration-500 rounded-none relative;
+  }
+
+  .table-header {
+    @apply py-4 text-[10px] font-bold uppercase tracking-widest text-zinc-950/40 text-left;
+  }
+
+  .table-cell {
+    @apply py-4 text-xs font-bold text-zinc-950 uppercase;
+  }
+
+  /* admin dashboard bits */
+  .chart-wrapper {
+    @apply bg-white border border-[#e2e8f0] p-8 rounded-none shadow-sm;
+    height: 400px;
+    width: 100%;
+    min-height: 400px;
+  }
+
+  .status-badge {
+    @apply text-[9px] font-black uppercase tracking-tighter px-2 py-1 border;
+  }
+
+  .status-badge-success {
+    @apply bg-green-50 text-green-700 border-green-200;
+  }
+
+  .status-badge-info {
+    @apply bg-blue-50 text-blue-700 border-blue-200;
+  }
+
+  .status-badge-error {
+    @apply bg-red-50 text-red-700 border-red-200;
+  }
+
+  .status-badge-neutral {
+    @apply bg-zinc-50 text-zinc-500 border-zinc-200;
+  }
+
+  .status-badge-dark {
+    @apply bg-zinc-950 text-white border-zinc-800;
+  }
+
+  .media-preview {
+    @apply w-10 h-10 object-cover border border-[#e2e8f0];
+  }
+
+  /* layout boxes */
+  .card-white {
+    @apply bg-white border border-[#e2e8f0] p-8 lg:p-12;
+  }
+
+  .card-dark {
+    @apply bg-zinc-950 text-white p-8 lg:p-12;
+  }
+
+  .placeholder-card {
+    @apply py-12 border-2 border-dashed border-[#e2e8f0] flex flex-col items-center justify-center text-center;
+  }
+
+  .admin-table-container {
+    @apply border border-[#e2e8f0] bg-white rounded-none overflow-hidden shadow-sm;
+  }
+
+  /* small bits */
+  .summary-row {
+    @apply flex justify-between items-baseline;
+  }
+
+  .divider-soft {
+    @apply border-b border-[#f1f5f9];
+  }
+
+  .divide-soft {
+    @apply divide-y divide-[#f1f5f9];
+  }
+
+  .border-main {
+    @apply border border-[#e2e8f0];
+  }
+
+  .border-soft {
+    @apply border border-[#f1f5f9];
+  }
+}
+
+:root {
+  font-family: 'Inter', system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  color: #0f172a;
+  background-color: #f8fafc;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  display: flex;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+#root {
+  width: 100%;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+}
+
+.logo-text {
+  font-family: 'EB Garamond', serif;
+  font-style: italic;
+  font-weight: 600;
+}
+
+.mono {
+  font-family: 'Roboto Mono', monospace;
+}
