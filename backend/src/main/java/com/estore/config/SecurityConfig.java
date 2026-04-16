@@ -60,11 +60,13 @@ public class SecurityConfig {
     }
 
     // encoder for hashing passwords before saving to the db
+    @Bean 
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
     // handles cross origin requests so the frontend can talk to the backend
+    @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(Arrays.asList(allowedOrigin));
