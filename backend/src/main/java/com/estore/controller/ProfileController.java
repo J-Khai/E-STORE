@@ -18,12 +18,14 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/users/profile")
 @RequiredArgsConstructor
+// this is for users to see and change their own settings
 public class ProfileController {
 
     private final UserRepository userRepository;
     private final AddressRepository addressRepository;
     private final PaymentMethodRepository paymentMethodRepository;
 
+    // fetches the profile data for the logged in user
     @GetMapping
     public ResponseEntity<UserProfileDTO> getProfile(@AuthenticationPrincipal UserDetails userDetails) {
         if (userDetails == null) {
@@ -36,7 +38,7 @@ public class ProfileController {
         return ResponseEntity.ok(buildProfileDTO(user));
     }
 
-    @PutMapping
+    // lets users update their name or address
     public ResponseEntity<UserProfileDTO> updateProfile(
             @AuthenticationPrincipal UserDetails userDetails,
             @RequestBody UserProfileDTO dto) {
@@ -68,7 +70,7 @@ public class ProfileController {
         return ResponseEntity.ok(buildProfileDTO(user));
     }
 
-    @PostMapping("/payment")
+    // allows users to save a new payment card to their account
     public ResponseEntity<UserProfileDTO> addPaymentMethod(
             @AuthenticationPrincipal UserDetails userDetails,
             @RequestBody UserProfileDTO.PaymentMethodDTO dto) {

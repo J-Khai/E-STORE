@@ -47,7 +47,7 @@ const ProductCard = ({ product }) => {
             <button 
                 onClick={handleAddToCart}
                 disabled={product.stock === 0 || isAdded}
-                className={`w-full py-4 bg-zinc-950 text-white label-mono text-[10px] uppercase font-bold tracking-widest translate-y-4 group-hover:translate-y-0 transition-all duration-500 shadow-2xl ${isAdded ? 'bg-green-600' : ''}`}
+                className={`w-full py-4 bg-zinc-950 text-white label-mono text-[10px] uppercase font-bold tracking-widest translate-y-4 group-hover:translate-y-0 transition-all duration-500 shadow-2xl ${isAdded ? 'bg-green-600 pulse-tactile' : ''}`}
             >
                 {product.stock === 0 ? 'Unavailable' : (isAdded ? 'Added to Cart' : '+ Quick Add')}
             </button>

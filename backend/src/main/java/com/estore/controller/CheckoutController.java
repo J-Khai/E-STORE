@@ -19,6 +19,7 @@ public class CheckoutController {
 
     private final OrderService orderService;
 
+    // this is the main endpoint that starts the checkout logic when a user buys their cart
     @PostMapping
     public ResponseEntity<?> checkout(
             @AuthenticationPrincipal UserDetails user,

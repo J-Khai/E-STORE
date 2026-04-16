@@ -5,7 +5,7 @@ import { getCategories } from '../services/categoryService';
 import ProductGrid from '../components/catalog/ProductGrid';
 import CategorySidebar from '../components/catalog/CategorySidebar';
 
-const ProductGalleryPage = () => {
+const ProductCollectionPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const search = searchParams.get('search') || '';
   const selectedCategory = searchParams.get('categoryId') ? parseInt(searchParams.get('categoryId')) : null;
@@ -131,4 +131,4 @@ const ProductGalleryPage = () => {
   );
 };
 
-export default ProductGalleryPage;
+export default ProductCollectionPage;

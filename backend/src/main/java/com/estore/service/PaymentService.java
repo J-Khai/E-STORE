@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class PaymentService {
 
-    // Luhn algorithm - learned this in class, basically a checksum for card numbers
+    // luhn algorithm - learned this in class, basically a checksum for card numbers
     public boolean isValidLuhn(String cardNumber) {
         // strip spaces and dashes so formatting doesn't break it
         String digits = cardNumber.replaceAll("\\s|-", "");

@@ -23,6 +23,7 @@ import java.util.Arrays;
 @EnableWebSecurity
 @org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
 @RequiredArgsConstructor
+// this is the main security setup that controls who can access what endpoints
 public class SecurityConfig {
 
     private final JwtRequestFilter jwtRequestFilter;
@@ -46,6 +47,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/cart/**", "/api/checkout/**", "/api/orders/my").authenticated()
                 .anyRequest().hasRole("ADMIN")
             )
+            // we use stateless sessions because of jwt tokens
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
 
@@ -57,12 +59,12 @@ public class SecurityConfig {
         return authConfig.getAuthenticationManager();
     }
 
-    @Bean
+    // encoder for hashing passwords before saving to the db
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-    @Bean
+    // handles cross origin requests so the frontend can talk to the backend
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(Arrays.asList(allowedOrigin));

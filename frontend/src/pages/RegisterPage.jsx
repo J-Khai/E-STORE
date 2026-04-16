@@ -15,6 +15,7 @@ const RegisterPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
+  // updates the form data state as you type by matching the input name
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -29,12 +30,12 @@ const RegisterPage = () => {
       const queryParams = new URLSearchParams(location.search);
       const redirectParam = queryParams.get('redirect');
       if (redirectParam) {
-          navigate(`/login?redirect=${redirectParam}`);
+        navigate(`/login?redirect=${redirectParam}`);
       } else {
-          navigate('/login');
+        navigate('/login');
       }
     } catch (err) {
-      console.error('oops registration error', err);
+      console.error('registration error', err);
       setError('Registration failed. Email may already be in use.');
     } finally {
       setLoading(false);
@@ -118,9 +119,9 @@ const RegisterPage = () => {
         </form>
 
         <footer className="mt-12 text-center">
-            <p className="label-mono">
-                Already a member? <Link to={`/login${location.search}`} className="text-zinc-950 underline underline-offset-4">Log In</Link>
-            </p>
+          <p className="label-mono">
+            Already a member? <Link to={`/login${location.search}`} className="text-zinc-950 underline underline-offset-4">Log In</Link>
+          </p>
         </footer>
       </div>
     </div>

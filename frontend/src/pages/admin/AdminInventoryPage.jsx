@@ -31,14 +31,14 @@ const AdminInventoryPage = () => {
         setLoading(false);
       }
     };
-    
+
     const fetchCategories = async () => {
-        try {
-            const res = await axios.get('/categories');
-            setCategories(res.data);
-        } catch (err) {
-            console.error('Failed to load categories', err);
-        }
+      try {
+        const res = await axios.get('/categories');
+        setCategories(res.data);
+      } catch (err) {
+        console.error('Failed to load categories', err);
+      }
     };
 
     fetchInventory();
@@ -74,65 +74,65 @@ const AdminInventoryPage = () => {
   const [advancedImageFile, setAdvancedImageFile] = useState(null);
 
   const openAdvancedEdit = (product) => {
-      setAdvancedEditingProduct(product);
-      setAdvancedEditForm({
-          name: product.name || '',
-          description: product.description || '',
-          brand: product.brand || '',
-          categoryId: product.categoryId || (product.category?.id) || '',
-          price: product.price || 0,
-          stock: product.stock || 0,
-          imageUrl: product.imageUrl || '',
-          isFeatured: product.isFeatured || false
-      });
-      setAdvancedImageMode('URL');
-      setAdvancedImageFile(null);
+    setAdvancedEditingProduct(product);
+    setAdvancedEditForm({
+      name: product.name || '',
+      description: product.description || '',
+      brand: product.brand || '',
+      categoryId: product.categoryId || (product.category?.id) || '',
+      price: product.price || 0,
+      stock: product.stock || 0,
+      imageUrl: product.imageUrl || '',
+      isFeatured: product.isFeatured || false
+    });
+    setAdvancedImageMode('URL');
+    setAdvancedImageFile(null);
   };
 
   const handleAdvancedSave = async (e) => {
-      e.preventDefault();
-      try {
-          const res = await axios.put(`/admin/products/${advancedEditingProduct.id}`, {
-              ...advancedEditForm,
-              price: parseFloat(advancedEditForm.price),
-              stock: parseInt(advancedEditForm.stock),
-              imageUrl: advancedImageMode === 'URL' ? advancedEditForm.imageUrl : (advancedEditingProduct.imageUrl || '')
-          });
+    e.preventDefault();
+    try {
+      const res = await axios.put(`/admin/products/${advancedEditingProduct.id}`, {
+        ...advancedEditForm,
+        price: parseFloat(advancedEditForm.price),
+        stock: parseInt(advancedEditForm.stock),
+        imageUrl: advancedImageMode === 'URL' ? advancedEditForm.imageUrl : (advancedEditingProduct.imageUrl || '')
+      });
 
-          let updatedProduct = res.data;
+      let updatedProduct = res.data;
 
-          if (advancedImageMode === 'UPLOAD' && advancedImageFile) {
-              const formData = new FormData();
-              formData.append('file', advancedImageFile);
-              const imageRes = await axios.patch(`/admin/products/${advancedEditingProduct.id}/image`, formData, {
-                  headers: { 'Content-Type': 'multipart/form-data' }
-              });
-              updatedProduct = imageRes.data;
-          }
-
-          setProducts(prev => prev.map(p => p.id === advancedEditingProduct.id ? updatedProduct : p));
-          setAdvancedEditingProduct(null);
-          setEditingId(null);
-          toast.success("Product extensively modified.");
-      } catch (err) {
-          console.error(err);
-          toast.error("Failed advanced modification.");
+      if (advancedImageMode === 'UPLOAD' && advancedImageFile) {
+        const formData = new FormData();
+        formData.append('file', advancedImageFile);
+        const imageRes = await axios.patch(`/admin/products/${advancedEditingProduct.id}/image`, formData, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
+        updatedProduct = imageRes.data;
       }
+
+      setProducts(prev => prev.map(p => p.id === advancedEditingProduct.id ? updatedProduct : p));
+      setAdvancedEditingProduct(null);
+      setEditingId(null);
+      toast.success("Product extensively modified.");
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed advanced modification.");
+    }
   };
 
   const handleAddProduct = async (e) => {
     e.preventDefault();
     try {
       const res = await axios.post('/admin/products', {
-          ...newProductForm,
-          imageUrl: newProductImageMode === 'URL' ? newProductForm.imageUrl : '',
-          price: parseFloat(newProductForm.price || 0),
-          stock: parseInt(newProductForm.stock || 0),
-          category: newProductForm.categoryId ? { id: parseInt(newProductForm.categoryId) } : null
+        ...newProductForm,
+        imageUrl: newProductImageMode === 'URL' ? newProductForm.imageUrl : '',
+        price: parseFloat(newProductForm.price || 0),
+        stock: parseInt(newProductForm.stock || 0),
+        category: newProductForm.categoryId ? { id: parseInt(newProductForm.categoryId) } : null
       });
 
       let finalProduct = res.data;
-      
+
       if (newProductImageMode === 'UPLOAD' && newProductImageFile) {
         const formData = new FormData();
         formData.append('file', newProductImageFile);
@@ -257,7 +257,7 @@ const AdminInventoryPage = () => {
             <label htmlFor="restock" className="text-[10px] font-black uppercase tracking-widest text-zinc-950/60 cursor-pointer">Restock Needed ({"< 5"})</label>
           </div>
           <button onClick={() => setIsAddingMode(true)} className="btn-primary py-3 px-6 shrink-0 shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all">
-+ Add Item
+            + Add Item
           </button>
           <input
             type="text"
@@ -271,126 +271,126 @@ const AdminInventoryPage = () => {
 
       {/* Add Product Modal */}
       {isAddingMode && (
-         <div className="fixed inset-0 z-[999] bg-zinc-950/40 backdrop-blur-sm flex items-center justify-center p-6">
-            <div className="bg-white border-main shadow-2xl p-10 w-full max-w-2xl max-h-[90vh] overflow-y-auto animate-in fade-in zoom-in-95">
-                <div className="flex justify-between items-center mb-10 pb-6 divider-soft">
-                   <h2 className="text-3xl tracking-tighter uppercase font-bold text-zinc-950">Add Product</h2>
-                   <button onClick={() => setIsAddingMode(false)} className="text-zinc-400 hover:text-zinc-950">
-                        ✕
-                   </button>
-                </div>
-                <form onSubmit={handleAddProduct} className="space-y-6">
-                   <div className="grid grid-cols-2 gap-6">
-                       <input autoFocus required type="text" placeholder="Product Name" value={newProductForm.name} onChange={e => setNewProductForm({...newProductForm, name: e.target.value})} className="input-field w-full col-span-2" />
-                       <input type="text" placeholder="Brand / Designer" value={newProductForm.brand} onChange={e => setNewProductForm({...newProductForm, brand: e.target.value})} className="input-field w-full" />
-                       <select value={newProductForm.categoryId} onChange={e => setNewProductForm({...newProductForm, categoryId: e.target.value})} className="input-field w-full" required>
-                           <option value="" disabled>Select Category...</option>
-                           {categories.map(cat => (
-                               <option key={cat.id} value={cat.id}>{cat.name}</option>
-                           ))}
-                       </select>
-                       <div className="relative">
-                           <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[10px] font-bold uppercase opacity-30">PRICE</span>
-                           <input required type="number" step="0.01" min="0" placeholder="0.00" value={newProductForm.price} onChange={e => setNewProductForm({...newProductForm, price: e.target.value})} className="input-field w-full pl-16 font-mono font-bold" />
-                       </div>
-                       <div className="relative">
-                           <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[10px] font-bold uppercase opacity-30">QTY</span>
-                           <input required type="number" min="0" placeholder="0" value={newProductForm.stock} onChange={e => setNewProductForm({...newProductForm, stock: e.target.value})} className="input-field w-full pl-16 font-mono font-bold" />
-                       </div>
-                       <textarea required placeholder="Product Description..." value={newProductForm.description} onChange={e => setNewProductForm({...newProductForm, description: e.target.value})} className="input-field w-full col-span-2 min-h-[120px] resize-y" />
-                       
-                       <div className="col-span-2 flex flex-col gap-4 p-4 border-2 border-dashed border-zinc-200 bg-zinc-50/50">
-                           <div className="flex gap-4">
-                               <label className="flex items-center gap-2 cursor-pointer">
-                                   <input type="radio" checked={newProductImageMode === 'URL'} onChange={() => setNewProductImageMode('URL')} className="accent-zinc-950" />
-                                   <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-950/60">Use Image URL</span>
-                               </label>
-                               <label className="flex items-center gap-2 cursor-pointer">
-                                   <input type="radio" checked={newProductImageMode === 'UPLOAD'} onChange={() => setNewProductImageMode('UPLOAD')} className="accent-zinc-950" />
-                                   <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-950/60">Upload Image File</span>
-                               </label>
-                           </div>
-                           
-                           {newProductImageMode === 'URL' ? (
-                               <input type="url" placeholder="Placeholder Image URL (optional)" value={newProductForm.imageUrl} onChange={e => setNewProductForm({...newProductForm, imageUrl: e.target.value})} className="input-field w-full bg-white" />
-                           ) : (
-                               <input type="file" accept="image/*" onChange={e => setNewProductImageFile(e.target.files[0])} className="w-full text-[10px] font-bold uppercase p-2 border border-zinc-200 bg-white" />
-                           )}
-                       </div>
-                       
-                       <label className="flex items-center gap-4 col-span-2 p-4 bg-zinc-50 border-main cursor-pointer hover:bg-zinc-100 transition-colors">
-                           <input type="checkbox" checked={newProductForm.isFeatured} onChange={e => setNewProductForm({...newProductForm, isFeatured: e.target.checked})} className="w-5 h-5 accent-zinc-950" />
-                           <span className="text-[10px] font-black uppercase tracking-widest text-zinc-950/80 mt-1">Pin to Top Featured List</span>
-                       </label>
-                   </div>
-                   <div className="pt-6">
-                       <button type="submit" className="btn-primary w-full py-4 text-[12px] shadow-heavy mt-4">Confirm Injection</button>
-                   </div>
-                </form>
+        <div className="fixed inset-0 z-[999] bg-zinc-950/40 backdrop-blur-sm flex items-center justify-center p-6">
+          <div className="bg-white border-main shadow-2xl p-10 w-full max-w-2xl max-h-[90vh] overflow-y-auto animate-in fade-in zoom-in-95">
+            <div className="flex justify-between items-center mb-10 pb-6 divider-soft">
+              <h2 className="text-3xl tracking-tighter uppercase font-bold text-zinc-950">Add Product</h2>
+              <button onClick={() => setIsAddingMode(false)} className="text-zinc-400 hover:text-zinc-950">
+                ✕
+              </button>
             </div>
-         </div>
+            <form onSubmit={handleAddProduct} className="space-y-6">
+              <div className="grid grid-cols-2 gap-6">
+                <input autoFocus required type="text" placeholder="Product Name" value={newProductForm.name} onChange={e => setNewProductForm({ ...newProductForm, name: e.target.value })} className="input-field w-full col-span-2" />
+                <input type="text" placeholder="Brand / Designer" value={newProductForm.brand} onChange={e => setNewProductForm({ ...newProductForm, brand: e.target.value })} className="input-field w-full" />
+                <select value={newProductForm.categoryId} onChange={e => setNewProductForm({ ...newProductForm, categoryId: e.target.value })} className="input-field w-full" required>
+                  <option value="" disabled>Select Category...</option>
+                  {categories.map(cat => (
+                    <option key={cat.id} value={cat.id}>{cat.name}</option>
+                  ))}
+                </select>
+                <div className="relative">
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[10px] font-bold uppercase opacity-30">PRICE</span>
+                  <input required type="number" step="0.01" min="0" placeholder="0.00" value={newProductForm.price} onChange={e => setNewProductForm({ ...newProductForm, price: e.target.value })} className="input-field w-full pl-16 font-mono font-bold" />
+                </div>
+                <div className="relative">
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[10px] font-bold uppercase opacity-30">QTY</span>
+                  <input required type="number" min="0" placeholder="0" value={newProductForm.stock} onChange={e => setNewProductForm({ ...newProductForm, stock: e.target.value })} className="input-field w-full pl-16 font-mono font-bold" />
+                </div>
+                <textarea required placeholder="Product Description..." value={newProductForm.description} onChange={e => setNewProductForm({ ...newProductForm, description: e.target.value })} className="input-field w-full col-span-2 min-h-[120px] resize-y" />
+
+                <div className="col-span-2 flex flex-col gap-4 p-4 border-2 border-dashed border-zinc-200 bg-zinc-50/50">
+                  <div className="flex gap-4">
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input type="radio" checked={newProductImageMode === 'URL'} onChange={() => setNewProductImageMode('URL')} className="accent-zinc-950" />
+                      <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-950/60">Use Image URL</span>
+                    </label>
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input type="radio" checked={newProductImageMode === 'UPLOAD'} onChange={() => setNewProductImageMode('UPLOAD')} className="accent-zinc-950" />
+                      <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-950/60">Upload Image File</span>
+                    </label>
+                  </div>
+
+                  {newProductImageMode === 'URL' ? (
+                    <input type="url" placeholder="Placeholder Image URL (optional)" value={newProductForm.imageUrl} onChange={e => setNewProductForm({ ...newProductForm, imageUrl: e.target.value })} className="input-field w-full bg-white" />
+                  ) : (
+                    <input type="file" accept="image/*" onChange={e => setNewProductImageFile(e.target.files[0])} className="w-full text-[10px] font-bold uppercase p-2 border border-zinc-200 bg-white" />
+                  )}
+                </div>
+
+                <label className="flex items-center gap-4 col-span-2 p-4 bg-zinc-50 border-main cursor-pointer hover:bg-zinc-100 transition-colors">
+                  <input type="checkbox" checked={newProductForm.isFeatured} onChange={e => setNewProductForm({ ...newProductForm, isFeatured: e.target.checked })} className="w-5 h-5 accent-zinc-950" />
+                  <span className="text-[10px] font-black uppercase tracking-widest text-zinc-950/80 mt-1">Pin to Top Featured List</span>
+                </label>
+              </div>
+              <div className="pt-6">
+                <button type="submit" className="btn-primary w-full py-4 text-[12px] shadow-heavy mt-4">Confirm</button>
+              </div>
+            </form>
+          </div>
+        </div>
       )}
 
       {/* Advanced Edit Product Modal */}
       {advancedEditingProduct && advancedEditForm && (
-         <div className="fixed inset-0 z-[999] bg-zinc-950/40 backdrop-blur-sm flex items-center justify-center p-6">
-            <div className="bg-white border-main shadow-2xl p-10 w-full max-w-2xl max-h-[90vh] overflow-y-auto animate-in fade-in zoom-in-95">
-                <div className="flex justify-between items-center mb-10 pb-6 divider-soft">
-                   <h2 className="text-3xl tracking-tighter uppercase font-bold text-zinc-950">Modify Product</h2>
-                   <button onClick={() => setAdvancedEditingProduct(null)} className="text-zinc-400 hover:text-zinc-950">
-                        ✕
-                   </button>
-                </div>
-                <form onSubmit={handleAdvancedSave} className="space-y-6">
-                   <div className="grid grid-cols-2 gap-6">
-                       <input required type="text" placeholder="Product Name" value={advancedEditForm.name} onChange={e => setAdvancedEditForm({...advancedEditForm, name: e.target.value})} className="input-field w-full col-span-2" />
-                       <input type="text" placeholder="Brand / Designer" value={advancedEditForm.brand} onChange={e => setAdvancedEditForm({...advancedEditForm, brand: e.target.value})} className="input-field w-full" />
-                       <select value={advancedEditForm.categoryId} onChange={e => setAdvancedEditForm({...advancedEditForm, categoryId: e.target.value})} className="input-field w-full" required>
-                           <option value="" disabled>Select Category...</option>
-                           {categories.map(cat => (
-                               <option key={cat.id} value={cat.id}>{cat.name}</option>
-                           ))}
-                       </select>
-                       <div className="relative">
-                           <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[10px] font-bold uppercase opacity-30">PRICE</span>
-                           <input required type="number" step="0.01" min="0" placeholder="0.00" value={advancedEditForm.price} onChange={e => setAdvancedEditForm({...advancedEditForm, price: e.target.value})} className="input-field w-full pl-16 font-mono font-bold" />
-                       </div>
-                       <div className="relative">
-                           <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[10px] font-bold uppercase opacity-30">QTY</span>
-                           <input required type="number" min="0" placeholder="0" value={advancedEditForm.stock} onChange={e => setAdvancedEditForm({...advancedEditForm, stock: e.target.value})} className="input-field w-full pl-16 font-mono font-bold" />
-                       </div>
-                       <textarea required placeholder="Product Description..." value={advancedEditForm.description} onChange={e => setAdvancedEditForm({...advancedEditForm, description: e.target.value})} className="input-field w-full col-span-2 min-h-[120px] resize-y" />
-                       
-                       <div className="col-span-2 flex flex-col gap-4 p-4 border-2 border-dashed border-zinc-200 bg-zinc-50/50">
-                           <div className="flex gap-4">
-                               <label className="flex items-center gap-2 cursor-pointer">
-                                   <input type="radio" checked={advancedImageMode === 'URL'} onChange={() => setAdvancedImageMode('URL')} className="accent-zinc-950" />
-                                   <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-950/60">Use Image URL</span>
-                               </label>
-                               <label className="flex items-center gap-2 cursor-pointer">
-                                   <input type="radio" checked={advancedImageMode === 'UPLOAD'} onChange={() => setAdvancedImageMode('UPLOAD')} className="accent-zinc-950" />
-                                   <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-950/60">Upload Image File</span>
-                               </label>
-                           </div>
-                           
-                           {advancedImageMode === 'URL' ? (
-                               <input type="url" placeholder="Placeholder Image URL (optional)" value={advancedEditForm.imageUrl} onChange={e => setAdvancedEditForm({...advancedEditForm, imageUrl: e.target.value})} className="input-field w-full bg-white" />
-                           ) : (
-                               <input type="file" accept="image/*" onChange={e => setAdvancedImageFile(e.target.files[0])} className="w-full text-[10px] font-bold uppercase p-2 border border-zinc-200 bg-white" />
-                           )}
-                       </div>
-                       
-                       <label className="flex items-center gap-4 col-span-2 p-4 bg-zinc-50 border-main cursor-pointer hover:bg-zinc-100 transition-colors">
-                           <input type="checkbox" checked={advancedEditForm.isFeatured} onChange={e => setAdvancedEditForm({...advancedEditForm, isFeatured: e.target.checked})} className="w-5 h-5 accent-zinc-950" />
-                           <span className="text-[10px] font-black uppercase tracking-widest text-zinc-950/80 mt-1">Pin to Top Featured List</span>
-                       </label>
-                   </div>
-                   <div className="pt-6">
-                       <button type="submit" className="btn-primary w-full py-4 text-[12px] shadow-heavy mt-4">Confirm Override</button>
-                   </div>
-                </form>
+        <div className="fixed inset-0 z-[999] bg-zinc-950/40 backdrop-blur-sm flex items-center justify-center p-6">
+          <div className="bg-white border-main shadow-2xl p-10 w-full max-w-2xl max-h-[90vh] overflow-y-auto animate-in fade-in zoom-in-95">
+            <div className="flex justify-between items-center mb-10 pb-6 divider-soft">
+              <h2 className="text-3xl tracking-tighter uppercase font-bold text-zinc-950">Modify Product</h2>
+              <button onClick={() => setAdvancedEditingProduct(null)} className="text-zinc-400 hover:text-zinc-950">
+                ✕
+              </button>
             </div>
-         </div>
+            <form onSubmit={handleAdvancedSave} className="space-y-6">
+              <div className="grid grid-cols-2 gap-6">
+                <input required type="text" placeholder="Product Name" value={advancedEditForm.name} onChange={e => setAdvancedEditForm({ ...advancedEditForm, name: e.target.value })} className="input-field w-full col-span-2" />
+                <input type="text" placeholder="Brand / Designer" value={advancedEditForm.brand} onChange={e => setAdvancedEditForm({ ...advancedEditForm, brand: e.target.value })} className="input-field w-full" />
+                <select value={advancedEditForm.categoryId} onChange={e => setAdvancedEditForm({ ...advancedEditForm, categoryId: e.target.value })} className="input-field w-full" required>
+                  <option value="" disabled>Select Category...</option>
+                  {categories.map(cat => (
+                    <option key={cat.id} value={cat.id}>{cat.name}</option>
+                  ))}
+                </select>
+                <div className="relative">
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[10px] font-bold uppercase opacity-30">PRICE</span>
+                  <input required type="number" step="0.01" min="0" placeholder="0.00" value={advancedEditForm.price} onChange={e => setAdvancedEditForm({ ...advancedEditForm, price: e.target.value })} className="input-field w-full pl-16 font-mono font-bold" />
+                </div>
+                <div className="relative">
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[10px] font-bold uppercase opacity-30">QTY</span>
+                  <input required type="number" min="0" placeholder="0" value={advancedEditForm.stock} onChange={e => setAdvancedEditForm({ ...advancedEditForm, stock: e.target.value })} className="input-field w-full pl-16 font-mono font-bold" />
+                </div>
+                <textarea required placeholder="Product Description..." value={advancedEditForm.description} onChange={e => setAdvancedEditForm({ ...advancedEditForm, description: e.target.value })} className="input-field w-full col-span-2 min-h-[120px] resize-y" />
+
+                <div className="col-span-2 flex flex-col gap-4 p-4 border-2 border-dashed border-zinc-200 bg-zinc-50/50">
+                  <div className="flex gap-4">
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input type="radio" checked={advancedImageMode === 'URL'} onChange={() => setAdvancedImageMode('URL')} className="accent-zinc-950" />
+                      <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-950/60">Use Image URL</span>
+                    </label>
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input type="radio" checked={advancedImageMode === 'UPLOAD'} onChange={() => setAdvancedImageMode('UPLOAD')} className="accent-zinc-950" />
+                      <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-950/60">Upload Image File</span>
+                    </label>
+                  </div>
+
+                  {advancedImageMode === 'URL' ? (
+                    <input type="url" placeholder="Placeholder Image URL (optional)" value={advancedEditForm.imageUrl} onChange={e => setAdvancedEditForm({ ...advancedEditForm, imageUrl: e.target.value })} className="input-field w-full bg-white" />
+                  ) : (
+                    <input type="file" accept="image/*" onChange={e => setAdvancedImageFile(e.target.files[0])} className="w-full text-[10px] font-bold uppercase p-2 border border-zinc-200 bg-white" />
+                  )}
+                </div>
+
+                <label className="flex items-center gap-4 col-span-2 p-4 bg-zinc-50 border-main cursor-pointer hover:bg-zinc-100 transition-colors">
+                  <input type="checkbox" checked={advancedEditForm.isFeatured} onChange={e => setAdvancedEditForm({ ...advancedEditForm, isFeatured: e.target.checked })} className="w-5 h-5 accent-zinc-950" />
+                  <span className="text-[10px] font-black uppercase tracking-widest text-zinc-950/80 mt-1">Pin to Top Featured List</span>
+                </label>
+              </div>
+              <div className="pt-6">
+                <button type="submit" className="btn-primary w-full py-4 text-[12px] shadow-heavy mt-4">Confirm</button>
+              </div>
+            </form>
+          </div>
+        </div>
       )}
 
       {loading ? (
@@ -483,16 +483,16 @@ const AdminInventoryPage = () => {
                           </span>
                           {!isEditing && p.isFeatured && (
                             <span className="text-[8px] font-black uppercase tracking-widest text-blue-500 bg-blue-50 px-2 rounded-full border border-blue-200">
-                              ☆ Pinned
+                              Pinned
                             </span>
                           )}
                           {isEditing && (
                             <label className="flex items-center gap-2 cursor-pointer mt-1">
-                              <input 
-                                type="checkbox" 
-                                className="accent-zinc-950 w-3 h-3" 
-                                checked={editForm.isFeatured} 
-                                onChange={e => setEditForm(prev => ({...prev, isFeatured: e.target.checked}))} 
+                              <input
+                                type="checkbox"
+                                className="accent-zinc-950 w-3 h-3"
+                                checked={editForm.isFeatured}
+                                onChange={e => setEditForm(prev => ({ ...prev, isFeatured: e.target.checked }))}
                               />
                               <span className="text-[9px] font-black uppercase tracking-widest text-zinc-950/60">Pin to Front</span>
                             </label>
@@ -535,18 +535,18 @@ const AdminInventoryPage = () => {
                           </div>
                         ) : (
                           <div className="flex justify-end gap-4">
-                              <button
-                                onClick={() => startEditing(p)}
-                                className="text-[10px] font-bold uppercase underline underline-offset-4 tracking-widest text-zinc-950 hover:text-zinc-500 transition-all cursor-pointer active:scale-95"
-                              >
-                                Edit
-                              </button>
-                              <button
-                                onClick={() => handleDeleteProduct(p.id)}
-                                className="text-[10px] font-bold uppercase hover:underline underline-offset-4 tracking-widest text-red-500 hover:text-red-700 transition-all cursor-pointer active:scale-95"
-                              >
-                                Delete
-                              </button>
+                            <button
+                              onClick={() => startEditing(p)}
+                              className="text-[10px] font-bold uppercase underline underline-offset-4 tracking-widest text-zinc-950 hover:text-zinc-500 transition-all cursor-pointer active:scale-95"
+                            >
+                              Edit
+                            </button>
+                            <button
+                              onClick={() => handleDeleteProduct(p.id)}
+                              className="text-[10px] font-bold uppercase hover:underline underline-offset-4 tracking-widest text-red-500 hover:text-red-700 transition-all cursor-pointer active:scale-95"
+                            >
+                              Delete
+                            </button>
                           </div>
                         )}
                       </td>

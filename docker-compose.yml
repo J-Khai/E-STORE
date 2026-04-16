@@ -29,7 +29,6 @@ services:
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
       SPRING_JPA_DATABASE_PLATFORM: org.hibernate.dialect.PostgreSQLDialect
       JWT_SECRET: ${JWT_SECRET}
-      #ALLOWED_ORIGIN: ${ALLOWED_ORIGIN:-http://localhost:5173}
       ALLOWED_ORIGIN: http://localhost:3000
     ports:
       - "${BACKEND_PORT:-8081}:8081"

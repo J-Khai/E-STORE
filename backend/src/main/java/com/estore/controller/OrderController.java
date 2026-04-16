@@ -19,6 +19,7 @@ public class OrderController {
 
     private final OrderService orderService;
 
+    // gets the list of orders for the currently logged in person
     @GetMapping("/my")
     public ResponseEntity<List<OrderResponseDTO>> getMyOrders(@AuthenticationPrincipal UserDetails userDetails) {
         if (userDetails == null) {

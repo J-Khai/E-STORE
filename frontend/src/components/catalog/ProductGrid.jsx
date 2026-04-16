@@ -1,13 +1,27 @@
 import React from 'react';
 import ProductCard from './ProductCard';
+import Skeleton from '../common/Skeleton';
 
 const ProductGrid = ({ products, loading, error }) => {
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[50vh] animate-pulse">
-        <div className="text-sm font-semibold text-zinc-950/40 uppercase tracking-widest">
-          Collecting Catalog...
-        </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 py-8 animate-in fade-in duration-500">
+        {[...Array(8)].map((_, i) => (
+          <div key={i} className="flex flex-col gap-6">
+            <Skeleton height="400px" width="100%" />
+            <div className="space-y-4">
+              <div className="flex justify-between">
+                <Skeleton height="12px" width="60px" />
+                <Skeleton height="12px" width="40px" />
+              </div>
+              <Skeleton height="24px" width="100%" />
+              <div className="space-y-2">
+                <Skeleton height="8px" width="100%" />
+                <Skeleton height="8px" width="80%" />
+              </div>
+            </div>
+          </div>
+        ))}
       </div>
     );
   }

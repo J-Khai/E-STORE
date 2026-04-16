@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.function.Function;
 
 @Service
+// helper class to handle creating and parsing jwt tokens
 public class JwtUtil {
 
     @Value("${jwt.secret}")
@@ -50,6 +51,7 @@ public class JwtUtil {
         return extractExpiration(token).before(new Date());
     }
 
+    // creates a new token when a user logs in successfully
     public String generateToken(UserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
         return createToken(claims, userDetails.getUsername());
@@ -65,6 +67,7 @@ public class JwtUtil {
                 .compact();
     }
 
+    // checks if the token username matches the user and if it's not expired
     public Boolean validateToken(String token, UserDetails userDetails) {
         final String username = extractUsername(token);
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));

@@ -18,11 +18,12 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/admin/reports")
 @RequiredArgsConstructor
+// this handles building the pdf sales reports for the admin dashboard
 public class AdminReportController {
 
     private final OrderRepository orderRepository;
 
-    @GetMapping("/sales")
+    // this is the main method that creates the pdf and sends it to the browser
     public void generateSalesReport(HttpServletResponse response,
                                     @RequestParam(value = "window", defaultValue = "30D") String window) throws IOException, DocumentException {
 
@@ -39,11 +40,13 @@ public class AdminReportController {
         // get orders for the report
         List<Order> orders = orderRepository.findByCreatedAtBetween(startDate, java.time.LocalDateTime.now());
 
+        // tell the browser to expect a pdf file download
         response.setContentType("application/pdf");
         response.setHeader(HttpHeaders.CONTENT_DISPOSITION,
                 "attachment; filename=\"sales-report-" + window + "-" +
                 LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) + ".pdf\"");
 
+        // setting up the document structure using openpdf library
         Document document = new Document(PageSize.A4);
         PdfWriter.getInstance(document, response.getOutputStream());
         document.open();
@@ -66,7 +69,7 @@ public class AdminReportController {
         generatedAt.setSpacingAfter(20);
         document.add(generatedAt);
 
-        // totals at the top
+        // loop through orders and add up the revenue for paid ones
         double totalRevenue = orders.stream()
             .filter(o -> o.getStatus() != null && java.util.Arrays.asList("PAID", "APPROVED", "PROCESSED", "SHIPPED").contains(o.getStatus().name()))
             .mapToDouble(o -> o.getTotalAmount() != null ? o.getTotalAmount() : 0.0)
@@ -92,6 +95,7 @@ public class AdminReportController {
         table.setWidths(new float[]{0.8f, 2.2f, 1.5f, 1.5f, 1.2f});
 
         String[] headers = {"ORDER ID", "CUSTOMER EMAIL", "CUSTOMER NAME", "TOTAL", "STATUS"};
+        // create the header row with the specific columns we need
         for (String h : headers) {
             PdfPCell cell = new PdfPCell(new Phrase(h, headerFont));
             cell.setBackgroundColor(new Color(15, 23, 42));

@@ -137,8 +137,48 @@
     @apply border-b border-[#f1f5f9];
   }
 
-  .divide-soft {
-    @apply divide-y divide-[#f1f5f9];
+  /* glass effect for the sticky headers */
+  .glass-nav {
+    @apply sticky top-0 z-[100] backdrop-blur-md bg-white/70 border-b border-zinc-200/50;
+  }
+
+  /* custom scrollbar to match the zinc theme */
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    @apply bg-zinc-50;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply bg-zinc-300 rounded-full;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-zinc-400;
+  }
+
+  /* skeleton loading effect */
+  .skeleton {
+    @apply bg-zinc-100 overflow-hidden relative;
+  }
+  .skeleton::after {
+    content: "";
+    @apply absolute inset-0 -translate-x-full;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+    animation: shimmer 1.5s infinite;
+  }
+
+  @keyframes shimmer {
+    100% { transform: translateX(100%); }
+  }
+
+  /* small tactile pulse for buttons */
+  .pulse-tactile {
+    animation: pulse-soft 0.4s cubic-bezier(0.4, 0, 0.6, 1);
+  }
+
+  @keyframes pulse-soft {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(0.98); }
   }
 
   .border-main {

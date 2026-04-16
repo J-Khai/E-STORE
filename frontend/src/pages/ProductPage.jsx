@@ -5,6 +5,7 @@ import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import axios from '../api/axios';
 import toast from 'react-hot-toast';
+import Skeleton from '../components/common/Skeleton';
 
 const ProductPage = () => {
     const { id } = useParams();
@@ -90,8 +91,35 @@ const ProductPage = () => {
     }, [id]);
 
     if (loading) return (
-        <div className="flex items-center justify-center min-h-[50vh] mono text-[10px] uppercase tracking-widest animate-pulse">
-            Loading Product Details...
+        <div className="page-container py-20 lg:py-32">
+            <div className="flex flex-col lg:flex-row gap-12 lg:gap-20">
+                {/* ghostly image preview */}
+                <div className="flex-1 min-h-[500px]">
+                    <Skeleton height="100%" width="100%" />
+                </div>
+
+                {/* ghostly product details */}
+                <div className="flex-1 flex flex-col justify-start space-y-8">
+                    <div className="space-y-4">
+                        <Skeleton height="20px" width="150px" />
+                        <Skeleton height="60px" width="100%" />
+                        <Skeleton height="20px" width="200px" />
+                    </div>
+                    <div className="w-20 h-1 bg-zinc-100"></div>
+                    <div className="flex items-center gap-6">
+                        <Skeleton height="40px" width="100px" />
+                        <Skeleton height="40px" width="120px" />
+                    </div>
+                    <div className="space-y-4 pt-8">
+                        <Skeleton height="15px" width="100%" />
+                        <Skeleton height="15px" width="90%" />
+                        <Skeleton height="15px" width="95%" />
+                    </div>
+                    <div className="pt-12">
+                        <Skeleton height="60px" width="100%" />
+                    </div>
+                </div>
+            </div>
         </div>
     );
 

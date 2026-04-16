@@ -24,7 +24,7 @@ const AdminDashboardPage = () => {
         }
     };
 
-    fetchStats(); // immediate on mount / route change
+    fetchStats(); 
 
     // auto-refresh every 30 seconds so the count drops when orders get processed
     const interval = setInterval(fetchStats, 30_000);

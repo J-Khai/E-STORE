@@ -16,6 +16,7 @@ public class UserController {
 
     private final UserRepository userRepository;
 
+    // generic list of all users
     @GetMapping
     public ResponseEntity<List<com.estore.model.User>> getAllUsers() {
         return ResponseEntity.ok(userRepository.findAll());

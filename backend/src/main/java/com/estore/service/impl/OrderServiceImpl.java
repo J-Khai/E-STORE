@@ -16,6 +16,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+// this manages the whole checkout process step by step
 public class OrderServiceImpl implements OrderService {
 
     private final OrderRepository orderRepository;
@@ -25,8 +26,7 @@ public class OrderServiceImpl implements OrderService {
     private final PaymentService paymentService;
     private final PaymentMethodRepository paymentMethodRepository;
 
-    @Override
-    @Transactional
+    // this is the big method that handles a new order from start to finish
     public CheckoutResponse checkout(String email, CheckoutRequest request) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
@@ -39,6 +39,7 @@ public class OrderServiceImpl implements OrderService {
             Product product = productRepository.findById(lineItem.getProductId())
                     .orElseThrow(() -> new IllegalArgumentException("Product not found: " + lineItem.getProductId()));
 
+            // throw an error if the user tries to buy more than what we have
             if (lineItem.getQuantity() > product.getStock()) {
                 throw new InsufficientStockForCheckoutException(product.getName(), product.getStock());
             }
@@ -55,7 +56,7 @@ public class OrderServiceImpl implements OrderService {
                     .build());
         }
 
-        // save the order first before we check the card, that way we have a record either way
+        // save the order as pending so the db has a record before we hit the bank
         Order order = Order.builder()
                 .user(user)
                 .status(OrderStatus.PENDING_PAYMENT)
@@ -69,7 +70,7 @@ public class OrderServiceImpl implements OrderService {
         order.setItems(items);
         order = orderRepository.save(order);
 
-        // run the luhn algorithm to validate the card number unless using a saved payment token
+        // validate the card using luhn or just trust the token if they used a saved one
         boolean isValid = false;
 
         if (request.getPaymentToken() != null && !request.getPaymentToken().trim().isEmpty()) {
@@ -111,6 +112,7 @@ public class OrderServiceImpl implements OrderService {
         // card passed so now we subtract the stock and clear the cart
         for (CheckoutRequest.CheckoutItemRequest lineItem : request.getItems()) {
             Product product = productRepository.findById(lineItem.getProductId()).orElseThrow();
+            // update the inventory so the next person sees the right stock
             product.setStock(product.getStock() - lineItem.getQuantity());
             productRepository.save(product);
         }

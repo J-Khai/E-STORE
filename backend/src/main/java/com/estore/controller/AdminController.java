@@ -22,6 +22,7 @@ import java.util.*;
 @RestController
 @RequestMapping("/api/admin")
 @RequiredArgsConstructor
+// this is the main hub for admin stuff like managing users and products
 public class AdminController {
 
     private final OrderRepository orderRepository;
@@ -33,12 +34,13 @@ public class AdminController {
 
     // product endpoints
 
+    // get every single product we have in the db
     @GetMapping("/products")
     public ResponseEntity<List<Product>> getAllProducts() {
         return ResponseEntity.ok(productRepository.findAll());
     }
 
-    @PutMapping("/products/{id}")
+    // this handles partial updates for products so we dont have to send every field
     public ResponseEntity<Product> updateProduct(@PathVariable("id") Long id,
                                                   @RequestBody Map<String, Object> updates) {
         Product p = productRepository.findById(id)
@@ -75,6 +77,7 @@ public class AdminController {
     }
     // lets admin manually force an order from REJECTED to PAID
     @org.springframework.security.access.prepost.PreAuthorize("hasRole('ADMIN')")
+    // if a payment fails but the admin knows they paid, they can force the order to go through
     @PatchMapping("/orders/{id}/approve")
     public ResponseEntity<Order> approveOrder(@PathVariable("id") Long id) {
         Order order = orderRepository.findById(id)
@@ -130,7 +133,7 @@ public class AdminController {
         return ResponseEntity.noContent().build();
     }
 
-    // upload a new image for a product, saves to static folder and updates the url
+    // takes a file from the frontend and stores it locally so we can show it on the site
     @org.springframework.security.access.prepost.PreAuthorize("hasRole('ADMIN')")
     @PatchMapping("/products/{id}/image")
     public ResponseEntity<Product> uploadProductImage(@PathVariable("id") Long id,
@@ -198,7 +201,7 @@ public class AdminController {
 
     @org.springframework.security.access.prepost.PreAuthorize("hasRole('ADMIN')")
     @org.springframework.transaction.annotation.Transactional
-    @PutMapping("/users/{id}")
+    // update user details including the address and card validation
     public ResponseEntity<Map<String, String>> updateUser(@PathVariable("id") Long id,
                                                             @RequestBody Map<String, Object> updates) {
         com.estore.model.User user = userRepository.findById(id)
@@ -262,7 +265,7 @@ public class AdminController {
 
     @org.springframework.security.access.prepost.PreAuthorize("hasRole('ADMIN')")
     @org.springframework.transaction.annotation.Transactional
-    @DeleteMapping("/users/{id}")
+    // delete a user but throw an error if they are an admin
     public ResponseEntity<?> deleteUser(@PathVariable("id") Long id) {
         com.estore.model.User user = userRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("User not found: " + id));
@@ -312,7 +315,7 @@ public class AdminController {
         return ResponseEntity.ok(stats);
     }
 
-    // daily totals for the graph
+    // gets the daily revenue numbers for the analytics chart on the dashboard
     @GetMapping("/analytics/daily-sales")
     public ResponseEntity<Map<String, Double>> getDailySales(@RequestParam(value = "window", defaultValue = "30D") String window) {
         java.time.LocalDateTime startDate;
