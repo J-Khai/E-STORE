@@ -82,14 +82,16 @@ const ProductCollectionPage = () => {
 
   return (
     <div className="page-container flex flex-col lg:flex-row gap-6 lg:gap-12 text-zinc-950">
-      <CategorySidebar
-        categories={categories}
-        selectedCategory={selectedCategory}
-        handleCategorySelect={handleCategorySelect}
-        brands={brands}
-        selectedBrand={selectedBrand}
-        handleBrandSelect={handleBrandSelect}
-      />
+      <aside className="lg:sticky lg:top-[100px] lg:h-fit lg:w-72 shrink-0">
+        <CategorySidebar
+          categories={categories}
+          selectedCategory={selectedCategory}
+          handleCategorySelect={handleCategorySelect}
+          brands={brands}
+          selectedBrand={selectedBrand}
+          handleBrandSelect={handleBrandSelect}
+        />
+      </aside>
 
       <main className="flex-1">
         <header className="mb-12 divider-soft pb-8 flex flex-col items-start gap-6">
