@@ -12,7 +12,7 @@ Once it wakes up, everything runs normally. If you refresh or come back later (w
 Hosting Setup
 Frontend (React): Deployed on Netlify
 Backend (Spring Boot API): Hosted on Render
-Database (PostgreSQL): Also hosted on Render
+Database (PostgreSQL): Hosted on Neon
 The frontend is static, so it loads instantly. The only delay you might notice comes from the backend waking up.
 
 Get the Code
