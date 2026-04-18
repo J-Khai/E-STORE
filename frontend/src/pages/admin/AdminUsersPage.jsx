@@ -162,14 +162,14 @@ const AdminUsersPage = () => {
                                                             <input
                                                                 type="text"
                                                                 className="text-xs uppercase font-bold tracking-tight bg-zinc-50 border border-zinc-200 px-2 py-1 w-full"
-                                                                placeholder="ST"
+                                                                placeholder="Province/State"
                                                                 value={editForm.address.state}
                                                                 onChange={e => setEditForm(p => ({ ...p, address: { ...p.address, state: e.target.value } }))}
                                                             />
                                                             <input
                                                                 type="text"
                                                                 className="text-xs uppercase font-bold tracking-tight bg-zinc-50 border border-zinc-200 px-2 py-1 w-full"
-                                                                placeholder="ZIP"
+                                                                placeholder="ZIP/POSTAL code"
                                                                 value={editForm.address.zip}
                                                                 onChange={e => setEditForm(p => ({ ...p, address: { ...p.address, zip: e.target.value } }))}
                                                             />

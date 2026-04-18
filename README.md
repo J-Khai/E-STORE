@@ -33,12 +33,27 @@ Access
 Frontend: http://localhost:3000
 Backend API: http://localhost:8081
 
+Optional: If you want to use a custom database name or password, open docker-compose.yml and update the environment variables under the db: section:
+	POSTGRES_USER
+	POSTGRES_PASSWORD
+	POSTGRES_DB
+
+	NOTE: you can use the example env file given create a .env file and add the variables.
+
 Run Locally (Without Docker)
 If you want to run each part manually:
 1. Database (PostgreSQL)
 Create a database called estore
 Update credentials in:
  backend/src/main/resources/application.yml
+
+
+ username: postgres (default)
+ password: dev_password_do_not_use (change to your local Postgres password)
+ url: jdbc:postgresql://localhost:5432/estore (change estore if you named your DB something else)
+ jwt.secret and cors.allowed-origin can also be modified here if needed.
+
+ I recommend using an env file to store these credentials. There is an example env file given.
 
 2. Backend (Spring Boot)
 cd backend
@@ -60,4 +75,4 @@ Email: customer@estore.com
 Password: password
 
 Final Notes
-This project was built to feel closer to a real-world setup rather than just a demo. It’s not perfect, but it’s structured in a way that you can extend add payments, improve auth, scale APIs, whatever direction you want to take it.
+This project was built to feel closer to a real world setup rather than just a demo. It’s not perfect, but it’s built in a way that you can extend add payments, improve auth, scale APIs, whatever direction you want to take it.

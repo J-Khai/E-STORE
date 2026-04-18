@@ -41,6 +41,7 @@ public class AdminController {
     }
 
     // this handles partial updates for products so we dont have to send every field
+    @PutMapping("/products/{id}")
     public ResponseEntity<Product> updateProduct(@PathVariable("id") Long id,
                                                   @RequestBody Map<String, Object> updates) {
         Product p = productRepository.findById(id)
@@ -202,6 +203,7 @@ public class AdminController {
     @org.springframework.security.access.prepost.PreAuthorize("hasRole('ADMIN')")
     @org.springframework.transaction.annotation.Transactional
     // update user details including the address and card validation
+    @PutMapping("/users/{id}")
     public ResponseEntity<Map<String, String>> updateUser(@PathVariable("id") Long id,
                                                             @RequestBody Map<String, Object> updates) {
         com.estore.model.User user = userRepository.findById(id)
@@ -266,6 +268,7 @@ public class AdminController {
     @org.springframework.security.access.prepost.PreAuthorize("hasRole('ADMIN')")
     @org.springframework.transaction.annotation.Transactional
     // delete a user but throw an error if they are an admin
+    @DeleteMapping("/users/{id}")
     public ResponseEntity<?> deleteUser(@PathVariable("id") Long id) {
         com.estore.model.User user = userRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("User not found: " + id));

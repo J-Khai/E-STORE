@@ -39,6 +39,7 @@ public class ProfileController {
     }
 
     // lets users update their name or address
+    @PutMapping
     public ResponseEntity<UserProfileDTO> updateProfile(
             @AuthenticationPrincipal UserDetails userDetails,
             @RequestBody UserProfileDTO dto) {
@@ -71,6 +72,7 @@ public class ProfileController {
     }
 
     // allows users to save a new payment card to their account
+    @PostMapping("/payment")
     public ResponseEntity<UserProfileDTO> addPaymentMethod(
             @AuthenticationPrincipal UserDetails userDetails,
             @RequestBody UserProfileDTO.PaymentMethodDTO dto) {

@@ -23,7 +23,7 @@ public class AdminReportController {
 
     private final OrderRepository orderRepository;
 
-    // this is the main method that creates the pdf and sends it to the browser
+    @GetMapping("/sales")
     public void generateSalesReport(HttpServletResponse response,
                                     @RequestParam(value = "window", defaultValue = "30D") String window) throws IOException, DocumentException {
 
