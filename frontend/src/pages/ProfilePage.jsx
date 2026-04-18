@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { getProfile, updateProfile, addPaymentMethod } from '../services/userService';
+import { getProfile, updateProfile, addPaymentMethod, removePaymentMethod } from '../services/userService';
 import toast from 'react-hot-toast';
 
 const ProfilePage = () => {
@@ -84,7 +84,22 @@ const ProfilePage = () => {
             toast.success("Payment method added.");
         } catch (err) {
             console.error("Card addition failed", err);
-            toast.error("Could not add payment method.");
+            if (err.response && err.response.status === 400) {
+               toast.error("You already have this card saved on your account.");
+            } else {
+               toast.error("Could not add payment method.");
+            }
+        }
+    };
+
+    const handleDeleteCard = async (id) => {
+        try {
+            const res = await removePaymentMethod(id);
+            setProfile(res.data);
+            toast.success("Payment method removed.");
+        } catch (err) {
+            console.error("Card deletion failed", err);
+            toast.error("Could not remove payment method.");
         }
     };
 
@@ -289,7 +304,12 @@ const ProfilePage = () => {
                                          <span className="label-mono text-[8px] uppercase opacity-40">Expires</span>
                                          <span className="text-[10px] font-bold mono">{pm.expiryDate}</span>
                                      </div>
-                                     <button className="text-[9px] uppercase font-bold opacity-0 group-hover:opacity-40 hover:opacity-100 transition-all text-red-500">Delete</button>
+                                     <button 
+                                         onClick={() => handleDeleteCard(pm.id)}
+                                         className="text-[9px] uppercase font-bold opacity-0 group-hover:opacity-40 hover:opacity-100 transition-all text-red-500"
+                                     >
+                                         Delete
+                                     </button>
                                 </div>
                             </div>
                         ))}

@@ -21,6 +21,7 @@ public class UserProfileDTO {
 
     @Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
     public static class PaymentMethodDTO {
+        private Long id;
         private String cardType;
         private String lastFourDigits;
         private String expiryDate;

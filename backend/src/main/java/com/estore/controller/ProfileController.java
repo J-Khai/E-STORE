@@ -84,6 +84,15 @@ public class ProfileController {
         User user = userRepository.findByEmailWithAddress(userDetails.getUsername())
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
+        // check for duplicates to ensure we don't have duplicate cards
+        boolean isDuplicate = paymentMethodRepository.findByUserId(user.getId()).stream()
+                .anyMatch(pm -> pm.getCardBrand().equalsIgnoreCase(dto.getCardType()) && 
+                                pm.getLastFourDigits().equals(dto.getLastFourDigits()));
+                                
+        if (isDuplicate) {
+            return ResponseEntity.badRequest().build();
+        }
+
         PaymentMethod pm = PaymentMethod.builder()
                 .user(user)
                 .cardBrand(dto.getCardType())
@@ -112,6 +121,7 @@ public class ProfileController {
 
         List<UserProfileDTO.PaymentMethodDTO> paymentMethodDTOs = paymentMethods.stream()
                 .map(pm -> UserProfileDTO.PaymentMethodDTO.builder()
+                        .id(pm.getId())
                         .cardType(pm.getCardBrand())
                         .lastFourDigits(pm.getLastFourDigits())
                         .expiryDate(pm.getExpirationDate())
@@ -126,5 +136,26 @@ public class ProfileController {
                 .address(addressDTO)
                 .paymentMethods(paymentMethodDTOs)
                 .build();
+    }
+
+    // deletes a payment method from the user's account
+    @DeleteMapping("/payment/{id}")
+    public ResponseEntity<UserProfileDTO> deletePaymentMethod(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @PathVariable("id") Long paymentMethodId) {
+        
+        if (userDetails == null) {
+            return ResponseEntity.status(401).build();
+        }
+
+        User user = userRepository.findByEmailWithAddress(userDetails.getUsername())
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        PaymentMethod pm = paymentMethodRepository.findById(paymentMethodId).orElse(null);
+        if (pm != null && pm.getUser().getId().equals(user.getId())) {
+             paymentMethodRepository.delete(pm);
+        }
+        
+        return ResponseEntity.ok(buildProfileDTO(user));
     }
 }

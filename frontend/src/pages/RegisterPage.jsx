@@ -36,7 +36,11 @@ const RegisterPage = () => {
       }
     } catch (err) {
       console.error('registration error', err);
-      setError('Registration failed. Email may already be in use.');
+      if (err.response && err.response.status === 400) {
+        setError('This email address is already registered.');
+      } else {
+        setError('Registration failed. Please try again later.');
+      }
     } finally {
       setLoading(false);
     }

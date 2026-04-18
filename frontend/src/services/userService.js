@@ -16,6 +16,10 @@ export const addPaymentMethod = (cardData) => {
     return api.post('/users/profile/payment', cardData);
 };
 
+export const removePaymentMethod = (id) => {
+    return api.delete(`/users/profile/payment/${id}`);
+};
+
 export const adminUpdateUser = (id, userData) => {
     return api.put(`/admin/users/${id}`, userData);
 };
@@ -29,6 +33,7 @@ export const userService = {
     getProfile,
     updateProfile,
     addPaymentMethod,
+    removePaymentMethod,
     adminUpdateUser,
     adminDeleteUser
 };
