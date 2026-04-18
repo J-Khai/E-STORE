@@ -155,9 +155,10 @@ public class AdminController {
         Files.copy(file.getInputStream(), target, StandardCopyOption.REPLACE_EXISTING);
 
         String baseUrl = System.getenv("ALLOWED_ORIGIN") != null && System.getenv("ALLOWED_ORIGIN").contains("netlify")
-                ? "https://estore-backend.onrender.com" // mock prod domain if needed
+                ? "https://e-store-4bl3.onrender.com" // [cloud domain for [product images can be changed if backend is moved to another cloud provider]
                 : "http://localhost:8081";
 
+        // we save the physical file to the server's disk above, but only save the url string in the database here
         product.setImageUrl(baseUrl + "/uploads/" + filename);
         return ResponseEntity.ok(productRepository.save(product));
     }
